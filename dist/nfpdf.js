@@ -84,47 +84,55 @@
                 options: '='
             },
             link: function link(scope, element, attrs) {
-                var canvas = document.createElement('canvas');
-
-                PDFJS.getDocument(scope.url).then(function (pdf) {
-                    pdf.getPage(1).then(function (page) {
-                        var options = scope.options || {};
-                        options.scale = options.scale || 1;
-                        var viewport = page.getViewport(options.scale);
-
-                        var canvas = document.createElement('canvas');
-                        var context = canvas.getContext('2d');
-                        canvas.height = viewport.height;
-                        canvas.width = viewport.width;
-
-                        if (options.resizeToWidth || options.resizeToHeight) {
-                            var resizeToWidth = options.resizeToWidth,
-                                resizeToHeight = options.resizeToHeight;
-
-                            var s = 1;
-                            if (resizeToWidth) {
-                                s = Math.round(resizeToWidth / canvas.width * 100) / 100;
-                            }
-                            if (resizeToHeight) {
-                                s = Math.round(resizeToHeight / canvas.height * 100) / 100;
-                            }
-                            canvas.width = canvas.width * s;
-                            canvas.height = canvas.height * s;
-                            viewport = page.getViewport(s);
-                        }
-
-                        var renderContext = {
-                            canvasContext: context,
-                            viewport: viewport
-                        };
-                        page.render(renderContext);
+                scope.$watch('url', function (url) {
+                    if (url !== undefined) {
+                        var node = void 0;
                         if (element && element.nodeType === 1) {
-                            element.appendChild(canvas);
+                            node = element;
                         }
                         if (element[0] && element[0].nodeType === 1) {
-                            element[0].appendChild(canvas);
+                            node = element[0];
                         }
-                    });
+                        while (node.hasChildNodes()) {
+                            node.removeChild(node.lastChild);
+                        }
+                        var canvas = document.createElement('canvas');
+                        PDFJS.getDocument(scope.url).then(function (pdf) {
+                            pdf.getPage(1).then(function (page) {
+                                var options = scope.options || {};
+                                options.scale = options.scale || 1;
+                                var viewport = page.getViewport(options.scale);
+
+                                var canvas = document.createElement('canvas');
+                                var context = canvas.getContext('2d');
+                                canvas.height = viewport.height;
+                                canvas.width = viewport.width;
+
+                                if (options.resizeToWidth || options.resizeToHeight) {
+                                    var resizeToWidth = options.resizeToWidth,
+                                        resizeToHeight = options.resizeToHeight;
+
+                                    var s = 1;
+                                    if (resizeToWidth) {
+                                        s = Math.round(resizeToWidth / canvas.width * 100) / 100;
+                                    }
+                                    if (resizeToHeight) {
+                                        s = Math.round(resizeToHeight / canvas.height * 100) / 100;
+                                    }
+                                    canvas.width = canvas.width * s;
+                                    canvas.height = canvas.height * s;
+                                    viewport = page.getViewport(s);
+                                }
+
+                                var renderContext = {
+                                    canvasContext: context,
+                                    viewport: viewport
+                                };
+                                page.render(renderContext);
+                                node.appendChild(canvas);
+                            });
+                        });
+                    }
                 });
             }
         };
