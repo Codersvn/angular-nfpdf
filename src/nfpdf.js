@@ -11,7 +11,6 @@
                 var canvas = document.createElement('canvas');
 
                 PDFJS.getDocument(scope.url).then(function(pdf) {
-                    console.log(pdf);
                     pdf.getPage(1).then(function(page) {
                         let options = scope.options || {};
                         options.scale = options.scale || 1;
@@ -35,7 +34,7 @@
                             }
                             canvas.width = canvas.width * s;
                             canvas.height = canvas.height * s;
-                            var viewport = page.getViewport(s);
+                            viewport = page.getViewport(s);
                         }
 
                         var renderContext = {

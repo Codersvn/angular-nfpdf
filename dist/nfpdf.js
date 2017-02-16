@@ -68,24 +68,27 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-((app) => {
+"use strict";
+
+
+(function (app) {
     "use strict";
-    app.directive('nfPdf', ['$sce', ($sce) => {
+
+    app.directive('nfPdf', ['$sce', function ($sce) {
         return {
             restrict: 'E',
             scope: {
                 url: '=',
-                options: '=',
+                options: '='
             },
-            link: (scope, element, attrs) => {
+            link: function link(scope, element, attrs) {
                 var canvas = document.createElement('canvas');
 
-                PDFJS.getDocument(scope.url).then(function(pdf) {
-                    console.log(pdf);
-                    pdf.getPage(1).then(function(page) {
-                        let options = scope.options || {};
+                PDFJS.getDocument(scope.url).then(function (pdf) {
+                    pdf.getPage(1).then(function (page) {
+                        var options = scope.options || {};
                         options.scale = options.scale || 1;
                         var viewport = page.getViewport(options.scale);
 
@@ -95,19 +98,19 @@
                         canvas.width = viewport.width;
 
                         if (options.resizeToWidth || options.resizeToHeight) {
-                            let {
-                                resizeToWidth, resizeToHeight
-                            } = options;
-                            let s = 1;
+                            var resizeToWidth = options.resizeToWidth,
+                                resizeToHeight = options.resizeToHeight;
+
+                            var s = 1;
                             if (resizeToWidth) {
-                                s = Math.round((resizeToWidth / canvas.width) * 100) / 100;
+                                s = Math.round(resizeToWidth / canvas.width * 100) / 100;
                             }
                             if (resizeToHeight) {
-                                s = Math.round((resizeToHeight / canvas.height) * 100) / 100;
+                                s = Math.round(resizeToHeight / canvas.height * 100) / 100;
                             }
                             canvas.width = canvas.width * s;
                             canvas.height = canvas.height * s;
-                            var viewport = page.getViewport(s);
+                            viewport = page.getViewport(s);
                         }
 
                         var renderContext = {
@@ -123,12 +126,10 @@
                         }
                     });
                 });
-
             }
         };
     }]);
 })(angular.module('nfpdf', []));
-
 
 /***/ })
 /******/ ]);
